@@ -1,1 +1,21 @@
+# Build output
 /build/
+/target/
+
+# IntelliJ IDEA
+/.idea/
+*.iml
+*.iws
+*.ipr
+
+# Eclipse (legacy - project migrated to Maven)
+/.classpath
+/.project
+/.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local environment overrides (never commit real credentials)
+/src/main/webapp/META-INF/context.local.xml

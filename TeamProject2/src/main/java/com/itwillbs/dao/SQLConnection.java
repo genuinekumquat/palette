@@ -11,7 +11,7 @@ public class SQLConnection {
 	public Connection getConnection() throws Exception {
 		Context init = new InitialContext();
 		DataSource ds=
-				(DataSource)init.lookup("java:comp/env/jdbc/c1d2304t1");
+				(DataSource)init.lookup("java:comp/env/jdbc/teamproject2");
 		Connection con=ds.getConnection();
 		return con;
 	}

@@ -8,7 +8,6 @@ import javax.servlet.http.HttpSession;
 import com.itwillbs.dao.ClassBoardDAO;
 import com.itwillbs.domain.ClassBoardDTO;
 import com.itwillbs.domain.PageDTO;
-import com.mysql.cj.Session;
 
 public class ClassBoardService {
 	
