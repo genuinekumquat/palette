@@ -14,45 +14,8 @@
     <link rel="stylesheet" href="css/bootstrap.css">
     <link rel="stylesheet" href="css/fonts.css">
     <link rel="stylesheet" href="css/style.css">
-    <!--[if lt IE 10]>
-    <div style="background: #212121; padding: 10px 0; box-shadow: 3px 3px 5px 0 rgba(0,0,0,.3); clear: both; text-align:center; position: relative; z-index:1;"><a href="http://windows.microsoft.com/en-US/internet-explorer/"><img src="images/ie8-panel/warning_bar_0000_us.jpg" border="0" height="42" width="820" alt="You are using an outdated browser. For a faster, safer browsing experience, upgrade for free today."></a></div>
-    <script src="js/html5shiv.min.js"></script>
-    <![endif]-->
 </head>
 <body>
-    <div class="preloader">
-      <div class="wrapper-triangle">
-        <div class="pen">
-          <div class="line-triangle">
-            <div class="triangle"></div>
-            <div class="triangle"></div>
-            <div class="triangle"></div>
-            <div class="triangle"></div>
-            <div class="triangle"></div>
-            <div class="triangle"></div>
-            <div class="triangle"></div>
-          </div>
-          <div class="line-triangle">
-            <div class="triangle"></div>
-            <div class="triangle"></div>
-            <div class="triangle"></div>
-            <div class="triangle"></div>
-            <div class="triangle"></div>
-            <div class="triangl																																																																																																																																																																																																	33333e"></div>
-            <div class="triangle"></div>
-          </div>
-          <div class="line-triangle">
-            <div class="triangle"></div>
-            <div class="triangle"></div>
-            <div class="triangle"></div>
-            <div class="triangle"></div>
-            <div class="triangle"></div>
-            <div class="triangle"></div>
-            <div class="triangle"></div>
-          </div>
-        </div>
-      </div>
-    </div>
     <div class="page">
       <!-- Page Header-->
       <header class="section page-header">
@@ -497,7 +460,7 @@
       <section class="section section-sm section-first bg-default">
         <div class="container">
           <h3 class="heading-3">Book your Table</h3>
-          <form class="rd-form rd-mailform form-style-1" data-form-output="form-output-global" data-form-type="contact" method="post" action="bat/rd-mailform.php">
+          <form class="rd-form form-style-1" data-form-output="form-output-global" data-form-type="contact" method="post" action="#">
             <div class="row row-20 gutters-20">
               <div class="col-md-6 col-lg-4 oh-desktop">
                 <div class="form-wrap wow slideInDown">
@@ -608,7 +571,7 @@
                 <h5 class="footer-modern-title oh-desktop"><span class="d-inline-block wow slideInLeft">Newsletter</span></h5>
                 <p class="wow fadeInRight">Sign up today for the latest news and updates.</p>
                 <!-- RD Mailform-->
-                <form class="rd-form rd-mailform rd-form-inline rd-form-inline-sm oh-desktop" data-form-output="form-output-global" data-form-type="subscribe" method="post" action="bat/rd-mailform.php">
+                <form class="rd-form rd-form-inline rd-form-inline-sm oh-desktop" data-form-output="form-output-global" data-form-type="subscribe" method="post" action="#">
                   <div class="form-wrap wow slideInUp">
                     <input class="form-input" id="subscribe-form-2-email" type="email" name="email" data-constraints="@Email @Required"/>
                     <label class="form-label" for="subscribe-form-2-email">Enter your E-mail</label>
