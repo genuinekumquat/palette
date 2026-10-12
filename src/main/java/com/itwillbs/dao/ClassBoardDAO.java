@@ -29,15 +29,101 @@ public class ClassBoardDAO {
 		try { 
 			// 1 2
 			con = new SQLConnection().getConnection();
-			String sql = "select * from class order by classNum desc limit ?, ?";
+			// 검색어, 카테고리 있으면 조건 추가
+			String sql = "select * from class" + getWhere(pageDTO) + " order by classNum desc limit ?, ?";
 			// 3
 			pstmt=con.prepareStatement(sql);
-			pstmt.setInt(1, pageDTO.getStartRow()-1); // 시작행 -1 
-			pstmt.setInt(2, pageDTO.getPageSize());//몇개	
+			int index = setWhere(pageDTO);
+			pstmt.setInt(index, pageDTO.getStartRow()-1); // 시작행 -1
+			pstmt.setInt(index+1, pageDTO.getPageSize());//몇개
 			//4
 			rs =pstmt.executeQuery();
-			boardList = new ArrayList<>();
-			//5 
+			//5
+			boardList = getList(rs);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			dbClose();
+		}
+		return boardList;
+	}// getBoardList
+
+	// 클래스 관리 => 로그인한 호스트가 등록한 클래스 리스트
+	public List<ClassBoardDTO> getMyBoardList(String hostId) {
+		System.out.println("ClassBoardDAO getMyBoardList()");
+		List<ClassBoardDTO> boardList = null;
+		try {
+			// 1 2
+			con = new SQLConnection().getConnection();
+			String sql = "select * from class where hostId=? order by classNum desc";
+			// 3
+			pstmt=con.prepareStatement(sql);
+			pstmt.setString(1, hostId);
+			//4
+			rs =pstmt.executeQuery();
+			//5
+			boardList = getList(rs);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			dbClose();
+		}
+		return boardList;
+	}// getMyBoardList
+
+	// 등록된 클래스 카테고리 목록 (중복 제거)
+	public List<String> getCategoryList() {
+		System.out.println("ClassBoardDAO getCategoryList()");
+		List<String> categoryList = new ArrayList<>();
+		try {
+			// 1 2
+			con = new SQLConnection().getConnection();
+			String sql = "select distinct classCategory from class where classCategory is not null order by classCategory";
+			// 3
+			pstmt=con.prepareStatement(sql);
+			//4
+			rs =pstmt.executeQuery();
+			//5
+			while(rs.next()) {
+				categoryList.add(rs.getString("classCategory"));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			dbClose();
+		}
+		return categoryList;
+	}// getCategoryList
+
+	// 검색어 => 제목에 키워드 포함, 카테고리 => 해당 카테고리만
+	private String getWhere(PageDTO pageDTO) {
+		String where = " where 1=1";
+		if(pageDTO.getSearch() != null) {
+			where += " and classSubject like ?";
+		}
+		if(pageDTO.getCategory() != null) {
+			where += " and classCategory = ?";
+		}
+		return where;
+	}// getWhere
+
+	// getWhere() 조건 ? 값 넣기 => 다음 ? 번호 리턴
+	private int setWhere(PageDTO pageDTO) throws SQLException {
+		int index = 1;
+		if(pageDTO.getSearch() != null) {
+			// 검색어의 %, _ 는 글자 그대로 검색 (like 와일드카드로 쓰이지 않게)
+			String search = pageDTO.getSearch().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
+			pstmt.setString(index++, "%" + search + "%");
+		}
+		if(pageDTO.getCategory() != null) {
+			pstmt.setString(index++, pageDTO.getCategory());
+		}
+		return index;
+	}// setWhere
+
+	// 결과 행 => ClassBoardDTO 리스트로 담기
+	private List<ClassBoardDTO> getList(ResultSet rs) throws SQLException {
+		List<ClassBoardDTO> boardList = new ArrayList<>();
 			while(rs.next()) {
 				ClassBoardDTO boardDTO = new ClassBoardDTO();
 				boardDTO.setClassNum(rs.getInt("classNum"));
@@ -51,23 +137,19 @@ public class ClassBoardDAO {
 				boardDTO.setClassFile(rs.getString("classFile"));
 				boardList.add(boardDTO);
 				}
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			dbClose();
-		}
 		return boardList;
-	}// getBoardList
+	}// getList
 
-	public int getBoardCount() {
+	public int getBoardCount(PageDTO pageDTO) {
 		System.out.println("ClassBoardDAO getBoardCount()");
 		int count =0;
 		try {
-			// 1단계 2단계 
+			// 1단계 2단계
 			con = new SQLConnection().getConnection();
-			// 3단계 문자열 -> sql구문 변경			// 3 select count(*) from board	
-			String sql = "select count(*) from class;";
+			// 3단계 문자열 -> sql구문 변경 (검색어, 카테고리 조건 포함)
+			String sql = "select count(*) from class" + getWhere(pageDTO);
 			pstmt=con.prepareStatement(sql);
+			setWhere(pageDTO);
 			//4 실행 => 결과저장
 			rs =pstmt.executeQuery();
 		if(rs.next()) {
@@ -88,7 +170,7 @@ public class ClassBoardDAO {
 		System.out.println("BoardDAO insertBoard()");
 		int classNum = 0;
 		try {
-			// 1단계 JDBC 프로그램 가져오기 
+			// 1단계 JDBC 프로그램 가져오기
 			// 2단계 디비 연결
 			con = new SQLConnection().getConnection();
 
@@ -96,8 +178,8 @@ public class ClassBoardDAO {
 			String sql = "insert into class(classSubject,hostId,classPrice,classCategory,classLocation,classContent,classFile) values(?,?,?,?,?,?,?)";
 			// 자동 증가된 classNum 값 받아오기
 			pstmt=con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-			pstmt.setString(1, boardDTO.getClassSubject()); 
-			pstmt.setString(2, boardDTO.getHostId()); 
+			pstmt.setString(1, boardDTO.getClassSubject());
+			pstmt.setString(2, boardDTO.getHostId());
 			pstmt.setInt(3, boardDTO.getClassPrice());
 			pstmt.setString(4, boardDTO.getClassCategory());
 			pstmt.setString(5, boardDTO.getClassLocation());

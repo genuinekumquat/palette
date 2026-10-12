@@ -57,12 +57,23 @@ public class ClassBoardController extends HttpServlet {
 			 pageDTO.setPageNum(pageNum);
 			 pageDTO.setCurrentPage(currentPage);
 
+			// 검색어 (검색창), 카테고리 (카테고리 클릭) => 빈 값이면 조건 없음
+			request.setCharacterEncoding("utf-8");
+			String search = request.getParameter("search");
+			String category = request.getParameter("category");
+			if(search != null && !search.trim().isEmpty()) {
+				pageDTO.setSearch(search.trim());
+			}
+			if(category != null && !category.isEmpty()) {
+				pageDTO.setCategory(category);
+			}
+
 			//ClassBoardService 객체생성
 			boardService = new ClassBoardService();
 			List<ClassBoardDTO> boardList = boardService.getBoardList(pageDTO);
 
-			// 게시판 전체 글 개수 구하기 
-			int count = boardService.getBoardCount();
+			// 게시판 전체 글 개수 구하기 (검색어, 카테고리 조건 포함)
+			int count = boardService.getBoardCount(pageDTO);
 			// 한화면에 출력될 페이지개수  pageBlock
 			int pageBlock = 10;
 			// 시작하는 페이지번호 startPage
@@ -85,6 +96,8 @@ public class ClassBoardController extends HttpServlet {
 			
 			request.setAttribute("boardList", boardList);
 			request.setAttribute("pageDTO", pageDTO);
+			// 카테고리 버튼 목록
+			request.setAttribute("categoryList", boardService.getCategoryList());
 			// 로그인한 회원정보 => 호스트면 클래스 등록 버튼 보이기
 			request.setAttribute("memberDTO", getLoginMember(request));
 
@@ -92,6 +105,22 @@ public class ClassBoardController extends HttpServlet {
 			dispatcher = request.getRequestDispatcher("board/class/list.jsp");
 			dispatcher.forward(request, response);
 			} // list
+
+		if (sPath.equals("/myClass.cbo")) { // 마이페이지 클래스 관리
+			System.out.println("뽑은 가상주소 비교 : /myClass.cbo");
+			// 호스트 계정만 클래스 관리 가능
+			MemberDTO memberDTO = getLoginMember(request);
+			if(!isHost(memberDTO)) {
+				alert(request, response, "호스트 계정만 클래스를 관리할 수 있습니다.");
+				return;
+			}
+			// 로그인한 호스트가 등록한 클래스 리스트 (최신 등록순)
+			boardService = new ClassBoardService();
+			List<ClassBoardDTO> boardList = boardService.getMyBoardList(memberDTO.getMemberId());
+			request.setAttribute("boardList", boardList);
+			dispatcher = request.getRequestDispatcher("board/class/myList.jsp");
+			dispatcher.forward(request, response);
+		} // myClass
 		
 		if (sPath.equals("/classWrite.cbo")) { // 클래스 등록
 			// 호스트 계정만 등록 가능

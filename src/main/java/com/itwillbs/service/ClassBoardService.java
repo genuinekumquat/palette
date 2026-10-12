@@ -37,19 +37,43 @@ public class ClassBoardService {
 		return boardList;
 	}// getBoardList
 
-	public int getBoardCount() {
+	public int getBoardCount(PageDTO pageDTO) {
 		System.out.println("ClassBoardService getBoardCount()");
 		int count=0;
 		try {
 			// BoardDAO 객체생성
 			boardDAO = new ClassBoardDAO();
-			// count = getBoardCount() 호출
-			count = boardDAO.getBoardCount();
+			// count = getBoardCount(pageDTO) 호출 (검색어, 카테고리 조건 포함)
+			count = boardDAO.getBoardCount(pageDTO);
 		} catch (Exception e) {
 			e.printStackTrace();
 			}
 		return count;
 	}//getBoardCount
+
+	public List<ClassBoardDTO> getMyBoardList(String hostId) {
+		System.out.println("ClassBoardService getMyBoardList()");
+		List<ClassBoardDTO> boardList = null;
+		try {
+			boardDAO = new ClassBoardDAO();
+			boardList = boardDAO.getMyBoardList(hostId);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return boardList;
+	}//getMyBoardList
+
+	public List<String> getCategoryList() {
+		System.out.println("ClassBoardService getCategoryList()");
+		List<String> categoryList = null;
+		try {
+			boardDAO = new ClassBoardDAO();
+			categoryList = boardDAO.getCategoryList();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return categoryList;
+	}//getCategoryList
 
 	// 클래스 등록 => 등록된 classNum 리턴
 	public int insertBoard(HttpServletRequest request) {

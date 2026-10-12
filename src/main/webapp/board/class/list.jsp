@@ -1,3 +1,4 @@
+<%@page import="java.net.URLEncoder"%>
 <%@page import="com.itwillbs.domain.MemberDTO"%>
 <%@page import="com.itwillbs.domain.PageDTO"%>
 <%@page import="com.itwillbs.domain.ClassBoardDTO"%>
@@ -90,6 +91,40 @@
     margin-right: 10px;
     text-decoration:none;
 }
+
+.class-search{
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.class-search input[type="search"]{
+    width: 300px;
+    padding: 5px;
+}
+
+.category-list{
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.category-list a{
+    display: inline-block;
+    padding: 6px 14px;
+    margin: 0 4px;
+    color: #545454;
+    font-size: 13px;
+    text-decoration: none;
+    border-radius: 15px;
+}
+
+.category-list a.current{
+    background: #ededed;
+}
+
+.empty{
+    text-align: center;
+    color: #999;
+}
   </style>
   <meta charset="utf-8">
   <link rel="stylesheet" href="shopcss.css">
@@ -111,23 +146,85 @@
     <div class="hero-header"></div>
 
     <div class="products">
-        <h3>클래스 목록</h3>
+<%!
+// 검색어, 카테고리 => HTML 태그로 실행되지 않게 변환
+String escape(String str) {
+	if(str == null) {
+		return "";
+	}
+	return str.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+			.replace("\"", "&quot;").replace("'", "&#39;");
+}
+
+// 주소에 붙일 값 => 한글, 특수문자 인코딩
+String encode(String str) {
+	try {
+		return URLEncoder.encode(str, "UTF-8");
+	} catch (Exception e) {
+		return "";
+	}
+}
+%>
 <%
 List<ClassBoardDTO> boardList =(List<ClassBoardDTO>)request.getAttribute("boardList");
 PageDTO pageDTO = (PageDTO)request.getAttribute("pageDTO");
+List<String> categoryList = (List<String>)request.getAttribute("categoryList");
 String memberId = (String)session.getAttribute("memberId");
+String search = pageDTO.getSearch();
+String category = pageDTO.getCategory();
+
+// 페이지 이동해도 검색어, 카테고리 유지 => 페이징 주소 뒤에 붙임
+String param = "";
+if(search != null) {
+	param += "&search=" + encode(search);
+}
+if(category != null) {
+	param += "&category=" + encode(category);
+}
+
+// 제목 => 검색어 있으면 검색 결과, 카테고리 있으면 카테고리 이름
+String title = "클래스 목록";
+if(search != null) {
+	title = "'" + escape(search) + "' 검색 결과";
+} else if(category != null) {
+	title = escape(category);
+}
 %>
+        <h3><%=title %></h3>
+
+        <%-- 검색창 => 제목에 키워드가 포함된 클래스 조회 (선택한 카테고리 유지) --%>
+        <form action="classList.cbo" method="get" class="class-search">
+<%	if(category != null) { %>
+        	<input type="hidden" name="category" value="<%=escape(category) %>">
+<%	} %>
+        	<input type="search" name="search" value="<%=escape(search) %>" placeholder="지금 생각나는 취미를 검색하세요.">
+        	<input type="submit" value="검색" class="btn">
+        </form>
+
+        <%-- 카테고리 => 클릭하면 해당 카테고리 클래스만 조회 --%>
+        <div class="category-list">
+        	<a href="classList.cbo" class="<%=category == null ? "current" : "" %>">전체</a>
+<%	if(categoryList != null) {
+		for(String c : categoryList) { %>
+        	<a href="classList.cbo?category=<%=encode(c) %>" class="<%=c.equals(category) ? "current" : "" %>"><%=escape(c) %></a>
+<%		}
+	} %>
+        </div>
+
         <div class="product-list">
-        
+
+<%	if(boardList == null || boardList.isEmpty()) { %>
+        <p class="empty">조회된 클래스가 없습니다.</p>
+<%	} %>
         <%
-for(int i=0; i<boardList.size(); i++){
+for(int i=0; boardList != null && i<boardList.size(); i++){
 	ClassBoardDTO boardDTO = boardList.get(i);
 	%>
              <a href="classContent.cbo?classNum=<%=boardDTO.getClassNum() %>" class="product">
                 <%-- 대표 이미지 없으면 기본 이미지 --%>
                 <img src="<%=boardDTO.getClassFile() != null ? "upload/" + boardDTO.getClassFile().replace("\"", "&quot;") : "images/cat-space.gif" %>" width="225" height="225px" style="object-fit: cover;">
                 <div class="product-name">
-                	제목 : <%=boardDTO.getClassSubject() %>
+                	제목 : <%=escape(boardDTO.getClassSubject()) %>
                 </div>
                 <div class="product-price">
                 	금액 : <%=boardDTO.getClassPrice() %>
@@ -146,6 +243,8 @@ MemberDTO memberDTO = (MemberDTO)request.getAttribute("memberDTO");
 <%if (memberDTO != null && "host".equals(memberDTO.getMemberType())) {%>
    <input type="button" value="클래스 등록" class="btn"
        					onclick="location.href='classWrite.cbo'">
+   <input type="button" value="나의 클래스 관리" class="btn"
+       					onclick="location.href='myClass.cbo'">
 <%}%>
 
  <div id="page_control">
@@ -154,14 +253,14 @@ MemberDTO memberDTO = (MemberDTO)request.getAttribute("memberDTO");
 // 시작페이지 11,21,31, prev 보임 
 if(pageDTO.getStartPage() > pageDTO.getPageBlock()){
 	%>
-	<a href = "classList.cbo?pageNum=<%=pageDTO.getStartPage()-pageDTO.getPageBlock() %>">Prev</a>
+	<a href = "classList.cbo?pageNum=<%=pageDTO.getStartPage()-pageDTO.getPageBlock() %><%=param %>">Prev</a>
 	<%
 }	
 %>
 <%
 for(int i = pageDTO.getStartPage(); i<=pageDTO.getEndPage(); i++){
 	%>
-	<a href = "classList.cbo?pageNum=<%=i %>"><%=i %></a>
+	<a href = "classList.cbo?pageNum=<%=i %><%=param %>"><%=i %></a>
 	<%
 }	
 	%>
@@ -170,7 +269,7 @@ for(int i = pageDTO.getStartPage(); i<=pageDTO.getEndPage(); i++){
 //끝페이지번호  전체페이지수 비교 => 전체페이지수 크면 => Next보임
 if(pageDTO.getEndPage() < pageDTO.getPageCount()){
 	%>
-	<a href="classList.cbo?pageNum=<%=pageDTO.getStartPage()+pageDTO.getPageBlock()%>">Next</a>
+	<a href="classList.cbo?pageNum=<%=pageDTO.getStartPage()+pageDTO.getPageBlock()%><%=param %>">Next</a>
 	<%
 }
 %>

@@ -74,4 +74,22 @@ public class PageDTO {
 		this.pageCount = pageCount;
 	}
 
+	// 검색어 (클래스 제목에 포함된 키워드)
+	private String search;
+	// 카테고리 (해당 카테고리 클래스만 조회)
+	private String category;
+
+	public String getSearch() {
+		return search;
+	}
+	public void setSearch(String search) {
+		this.search = search;
+	}
+	public String getCategory() {
+		return category;
+	}
+	public void setCategory(String category) {
+		this.category = category;
+	}
+
 }
