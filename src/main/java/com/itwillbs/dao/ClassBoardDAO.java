@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,36 +83,40 @@ public class ClassBoardDAO {
 		return count;
 	}//getBoardCount
 
-	public void insertBoard(ClassBoardDTO boardDTO) {
+	// 클래스 등록 => 등록된 classNum 리턴 (상세페이지로 이동하기 위해)
+	public int insertBoard(ClassBoardDTO boardDTO) {
 		System.out.println("BoardDAO insertBoard()");
-		// board 테이블 file 열추가 
-		// mysql -uroot -p1234 jspdb
-		// alter table board 
-		// add file varchar(100);
+		int classNum = 0;
 		try {
 			// 1단계 JDBC 프로그램 가져오기 
 			// 2단계 디비 연결
 			con = new SQLConnection().getConnection();
 
 			// 3단계 문자열 -> sql구문 변경
-			String sql = "insert into class(classSubject,hostId,classPrice,classCategory,classLocation,classContent) values(?,?,?,?,?,?)";
-			pstmt=con.prepareStatement(sql);
+			String sql = "insert into class(classSubject,hostId,classPrice,classCategory,classLocation,classContent,classFile) values(?,?,?,?,?,?,?)";
+			// 자동 증가된 classNum 값 받아오기
+			pstmt=con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			pstmt.setString(1, boardDTO.getClassSubject()); 
 			pstmt.setString(2, boardDTO.getHostId()); 
 			pstmt.setInt(3, boardDTO.getClassPrice());
 			pstmt.setString(4, boardDTO.getClassCategory());
 			pstmt.setString(5, boardDTO.getClassLocation());
 			pstmt.setString(6, boardDTO.getClassContent());
-			// 파일 추가 
-//			pstmt.setString(7, boardDTO.getFile());
+			// 대표 이미지 파일
+			pstmt.setString(7, boardDTO.getClassFile());
 			// 4단계 sql구문 실행
 			pstmt.executeUpdate();
-			
+			rs = pstmt.getGeneratedKeys();
+			if(rs.next()) {
+				classNum = rs.getInt(1);
+			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}finally {
 			dbClose();
 		}
+		return classNum;
 	}//insertBoard()
 
 	public ClassBoardDTO getBoard(int classNum) {
@@ -150,14 +155,15 @@ public class ClassBoardDAO {
 			// 2단계 디비 연결
 			con= new SQLConnection().getConnection();
 			// 3단계 sql구문 
-			String sql = "update class set classSubject=?,classPrice=?,classCategory=?,classLocation=?,classContent=? where classNum=?";
+			String sql = "update class set classSubject=?,classPrice=?,classCategory=?,classLocation=?,classContent=?,classFile=? where classNum=?";
 			pstmt=con.prepareStatement(sql);
-			pstmt.setString(1, boardDTO.getClassSubject()); 
+			pstmt.setString(1, boardDTO.getClassSubject());
 			pstmt.setInt(2, boardDTO.getClassPrice());
 			pstmt.setString(3, boardDTO.getClassCategory());
 			pstmt.setString(4, boardDTO.getClassLocation());
 			pstmt.setString(5, boardDTO.getClassContent());
-			pstmt.setInt(6, boardDTO.getClassNum());
+			pstmt.setString(6, boardDTO.getClassFile());
+			pstmt.setInt(7, boardDTO.getClassNum());
 			// 4단계 실행
 			pstmt.executeUpdate();
 		} catch (Exception e) {

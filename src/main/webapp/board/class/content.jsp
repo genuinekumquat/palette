@@ -123,6 +123,10 @@ ul.tabs li.current{
   display: inherit;
 }
 
+.class-img{
+  max-width: 400px;
+}
+
 .review{
   padding: 15px 0;
   border-bottom: 1px solid #eee;
@@ -201,7 +205,13 @@ ClassBoardDTO boardDTO = (ClassBoardDTO)request.getAttribute("boardDTO");
 <tr><td>카테고리</td><td><%=boardDTO.getClassCategory() %></td></tr>    
 <tr><td>내용</td><td><%=boardDTO.getClassContent() %></td></tr>    
 <tr><td>가격</td><td><%=boardDTO.getClassPrice() %></td></tr>    
-<tr><td>이미지파일</td><td><%=boardDTO.getClassFile() %></td></tr>    
+<tr><td>대표 이미지</td><td>
+<%	if(boardDTO.getClassFile() != null) { %>
+	<img src="upload/<%=escape(boardDTO.getClassFile()) %>" class="class-img">
+<%	} else { %>
+	<img src="images/cat-space.gif" class="class-img">
+<%	} %>
+</td></tr>
 </table>
         
 <input type="button" value="클래스 목록" class="btn" onclick = "location.href='classList.cbo'">

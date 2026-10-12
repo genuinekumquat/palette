@@ -99,10 +99,10 @@ public class ClassBoardController extends HttpServlet {
 			System.out.println("뽑은가상주소비교 :/classWritePro.cbo");
 			// ClassBoardService 객체생성
 			boardService = new ClassBoardService();
-			// 리턴할 형 insertBoard(request) 메서드 호출
-			boardService.insertBoard(request);
-			// classList.cbo 주소변경되면서 이동 
-			response.sendRedirect("classList.cbo");
+			// classNum = insertBoard(request) 메서드 호출
+			int classNum = boardService.insertBoard(request);
+			// 등록한 클래스 상세페이지로 주소변경되면서 이동
+			response.sendRedirect("classContent.cbo?classNum=" + classNum);
 		} // classWritePro
 		
 		if(sPath.equals("/classContent.cbo")) { // 클래스 리스트에서 게시물 클릭하면 글내용보기 
@@ -135,10 +135,10 @@ public class ClassBoardController extends HttpServlet {
 		if(sPath.equals("/classUpdatePro.cbo")) {
 			// BoardService 객체생성
 			boardService = new ClassBoardService();
-			// updateBoard(request) 호출
-			boardService.updateBoard(request);
-			// 주소 변경되면서 list.bo 이동 
-			response.sendRedirect("classList.cbo");
+			// classNum = updateBoard(request) 호출
+			int classNum = boardService.updateBoard(request);
+			// 수정한 클래스 상세페이지로 주소 변경되면서 이동
+			response.sendRedirect("classContent.cbo?classNum=" + classNum);
 		} // classUpdatePro
 		
 		if(sPath.equals("/classDelete.cbo")) { // 클래스 삭제

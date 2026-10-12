@@ -123,7 +123,8 @@ for(int i=0; i<boardList.size(); i++){
 	ClassBoardDTO boardDTO = boardList.get(i);
 	%>
              <a href="classContent.cbo?classNum=<%=boardDTO.getClassNum() %>" class="product">
-                <img src="images/cat-space.gif" width="225" height="225px">
+                <%-- 대표 이미지 없으면 기본 이미지 --%>
+                <img src="<%=boardDTO.getClassFile() != null ? "upload/" + boardDTO.getClassFile().replace("\"", "&quot;") : "images/cat-space.gif" %>" width="225" height="225px" style="object-fit: cover;">
                 <div class="product-name">
                 	제목 : <%=boardDTO.getClassSubject() %>
                 </div>
