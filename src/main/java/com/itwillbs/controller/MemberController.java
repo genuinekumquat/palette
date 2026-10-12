@@ -191,16 +191,18 @@ public class MemberController extends HttpServlet {
 			MemberDTO memberDTO = memberService.userInfoCheck(request);
 
 			if (memberDTO != null) {
-				// 입력한회원정보 일치하면 세션값 저장 ->idReport.me로 이동
-				HttpSession session = request.getSession();
-				session.setAttribute("memberId", memberDTO.getMemberId());
-				response.sendRedirect("idReport.me");
+				// 입력한회원정보 일치하면 찾은 아이디 담아서 -> idReport.jsp 주소변경없이 이동
+				// (세션 "memberId"에 저장하면 비밀번호 없이 로그인 상태가 되므로 request에만 담음)
+				request.setAttribute("findId", memberDTO.getMemberId());
+				dispatcher = request.getRequestDispatcher("member/login/idReport.jsp");
+				dispatcher.forward(request, response);
 			} else {
-				// memberDTO == null 아이디 비밀번호 틀림=> member/msg.jsp
-				dispatcher = request.getRequestDispatcher("member/msg.jsp");
+				// memberDTO == null 이름 이메일 불일치 => 알림 후 뒤로이동
+				request.setAttribute("msg", "입력하신 정보와 일치하는 회원이 없습니다.");
+				dispatcher = request.getRequestDispatcher("board/msg.jsp");
 				dispatcher.forward(request, response);
 			}
-		}//findIdPro 
+		}//findIdPro
 		
 		if (sPath.equals("/idReport.me")) { // 아이디 보여주기
 			// member/join/findPassword.jsp 주소변경없이 이동
@@ -246,19 +248,18 @@ public class MemberController extends HttpServlet {
 				// 아이디 이름 이메일 일치 -> 로그인(세션에 값 저장) -> PasswordReset.me 이동
 				System.out.println(memberDTO);
 				System.out.println("아이디 이름 이메일 일치");
-				// 세션 객체생성 => 세션 기억장소 안에 값 저장
+				// 세션 객체생성 => 비밀번호 재설정할 아이디 저장
+				// (로그인용 "memberId"와 분리 => 비밀번호 없이 로그인 상태가 되지 않게)
 				HttpSession session = request.getSession();
-				session.setAttribute("memberId", memberDTO.getMemberId());
-				session.setAttribute("memberName", memberDTO.getMemberName());
-				session.setAttribute("memberEmail", memberDTO.getMemberEmail());
+				session.setAttribute("resetId", memberDTO.getMemberId());
 				// 주소 변경하면서 이동 -> 가상주소 PasswordReset.me 이동
 				response.sendRedirect("PasswordReset.me");
 			} else {
 				// 아이디 이름 이메일 불일치 -> 아이디 이름 이메일 불일치 메세지, 뒤로이동
 				System.out.println(memberDTO);
 				System.out.println("아이디 이름 이메일 불일치");
-				// member/msg.jsp 주소변경없이 이동
-				dispatcher = request.getRequestDispatcher("member/msg.jsp");
+				request.setAttribute("msg", "아이디, 이름, 이메일이 일치하는 회원이 없습니다.");
+				dispatcher = request.getRequestDispatcher("board/msg.jsp");
 				dispatcher.forward(request, response);
 			}
 		} // findPasswordPro
@@ -267,9 +268,17 @@ public class MemberController extends HttpServlet {
 			// 수정하기 전에 디비 나의 정보 조회(세션값 memberId)
 			// 세션 객체생성
 			HttpSession session = request.getSession();
-			// "memberId" 세션값 가져오기 => String memberId 변수 저장
-			String memberId = (String) session.getAttribute("memberId");
-			System.out.println(memberId); // memberId값 확인용
+			// "resetId" 세션값 가져오기 => 비밀번호 찾기에서 본인확인된 아이디
+			String resetId = (String) session.getAttribute("resetId");
+			System.out.println(resetId); // resetId값 확인용
+			if (resetId == null) {
+				// 본인확인 안했으면 => 비밀번호 찾기로 이동
+				request.setAttribute("msg", "비밀번호 찾기에서 본인확인 후 재설정할 수 있습니다.");
+				request.setAttribute("url", "findPassword.me");
+				dispatcher = request.getRequestDispatcher("board/msg.jsp");
+				dispatcher.forward(request, response);
+				return;
+			}
 			// member/join/PasswordReset.jsp 주소변경없이 이동
 			dispatcher = request.getRequestDispatcher("member/login/PasswordReset.jsp");
 			dispatcher.forward(request, response);
@@ -279,22 +288,31 @@ public class MemberController extends HttpServlet {
 		if (sPath.equals("/PasswordResetPro.me")) { // 비밀번호 재설정
 			System.out.println("뽑은 가상주소 비교 : /PasswordResetPro.me");
 			HttpSession session = request.getSession();
-			// "memberId" 세션값 가져오기 => String memberId 변수 저장
-			String memberId = (String) session.getAttribute("memberId");
-			System.out.println(memberId); // memberId값 확인용
+			// "resetId" 세션값 가져오기 => 비밀번호 찾기에서 본인확인된 아이디
+			String resetId = (String) session.getAttribute("resetId");
+			System.out.println(resetId); // resetId값 확인용
+			String memberPassword = request.getParameter("memberPassword");
 			// MemberService 객체생성
 			memberService = new MemberService();
-			if (memberId != null) {
-				// 저장된 memberId값이 있으면 => updatePwMember(request) 메서드 호출
+			if (resetId == null) {
+				// 본인확인된 아이디 없으면 => 팝업창 띄운다.
+				request.setAttribute("msg", "비밀번호 찾기에서 본인확인 후 재설정할 수 있습니다.");
+				request.setAttribute("url", "findPassword.me");
+				dispatcher = request.getRequestDispatcher("board/msg.jsp");
+				dispatcher.forward(request, response);
+			} else if (memberPassword == null || memberPassword.length() < 6) {
+				// 비밀번호는 6자 이상
+				request.setAttribute("msg", "비밀번호는 6자 이상이어야 합니다.");
+				dispatcher = request.getRequestDispatcher("board/msg.jsp");
+				dispatcher.forward(request, response);
+			} else {
+				// 본인확인된 아이디 => updatePwMember(request) 메서드 호출
 				// sql => update member set memberPassword = ? where memberId = ?
 				memberService.updatePwMember(request);
-				// 팝업창 띄운 후 => 로그인페이지로 이동
-				dispatcher = request.getRequestDispatcher("member/loginsuccess.jsp");
-				dispatcher.forward(request, response);
-//				response.sendRedirect("login.me");
-			} else {
-				// 저장된 memberId값이 없으면 => 팝업창 띄운다.
-				dispatcher = request.getRequestDispatcher("member/msg.jsp");
+				// 재설정 끝나면 본인확인 값 삭제
+				session.removeAttribute("resetId");
+				// 비밀번호 변경 성공 알림 띄운 후 => 로그인페이지로 이동
+				dispatcher = request.getRequestDispatcher("member/changeSuccess.jsp");
 				dispatcher.forward(request, response);
 			}
 		} // PasswordResetPro

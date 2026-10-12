@@ -223,12 +223,12 @@ public class MemberService {
 
 	public void updatePwMember(HttpServletRequest request) {
 		System.out.println("MemberService updatePwMember()");
-		System.out.println(request.getParameter("memberId"));
 		try {
 			// request 한글처리
 			request.setCharacterEncoding("utf-8");
 			// 변수에 값 담기
-			String memberId = request.getParameter("memberId");
+			// 아이디 => 폼 값이 아니라 비밀번호 찾기에서 본인확인된 세션값 (다른 회원 비밀번호 변경 방지)
+			String memberId = (String) request.getSession().getAttribute("resetId");
 			String memberPassword = request.getParameter("memberPassword");
 			System.out.println(memberId);
 			// MemberDTO 객체생성 
