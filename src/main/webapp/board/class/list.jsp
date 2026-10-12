@@ -1,3 +1,4 @@
+<%@page import="com.itwillbs.domain.MemberDTO"%>
 <%@page import="com.itwillbs.domain.PageDTO"%>
 <%@page import="com.itwillbs.domain.ClassBoardDTO"%>
 <%@page import="java.util.List"%>
@@ -137,13 +138,16 @@ for(int i=0; i<boardList.size(); i++){
 }
 %>
 
-   <input type="button" value="클래스 등록" class="btn" 
+<%
+// 로그인한 회원정보 => 멤버 타입이 'host'인 경우만 클래스 등록 버튼 보이기
+// (수정, 삭제는 클래스 상세페이지에서 등록한 호스트 본인만 가능)
+MemberDTO memberDTO = (MemberDTO)request.getAttribute("memberDTO");
+%>
+<%if (memberDTO != null && "host".equals(memberDTO.getMemberType())) {%>
+   <input type="button" value="클래스 등록" class="btn"
        					onclick="location.href='classWrite.cbo'">
-  <input type="button" value="클래스 수정" class="btn" 
-       					onclick="location.href='classUpdate.cbo'">
-  <input type="button" value="클래스 삭제" class="btn" 
-       					onclick="location.href='classDelete.cbo'">
-       					
+<%}%>
+
  <div id="page_control">
 <%
 // 시작페이지 1페이지 prev 없음 

@@ -107,7 +107,7 @@ public class ClassBoardService {
 		return boardDTO;
 	} // getBoard
 	
-	// 클래스 수정 => 수정된 classNum 리턴
+	// 클래스 수정 => 수정된 classNum 리턴, 등록한 호스트 본인 아니면 -1 리턴
 	public int updateBoard(HttpServletRequest request) {
 		int classNum = 0;
 		try {
@@ -125,7 +125,16 @@ public class ClassBoardService {
 			// 기존 이미지 => 디비에서 가져오기
 			boardDAO = new ClassBoardDAO();
 			ClassBoardDTO oldDTO = boardDAO.getBoard(classNum);
-			String oldFile = oldDTO != null ? oldDTO.getClassFile() : null;
+
+			// 세션 로그인 아이디 == 클래스 등록한 호스트 아이디 인지 확인
+			String memberId = (String)request.getSession().getAttribute("memberId");
+			if(oldDTO == null || memberId == null || !memberId.equals(oldDTO.getHostId())) {
+				// 본인 아니면 업로드된 파일 삭제
+				FileUpload.delete(request, classFile);
+				return -1;
+			}
+
+			String oldFile = oldDTO.getClassFile();
 			if(classFile == null) {
 				// 새 이미지 선택 안했으면 기존 이미지 유지
 				classFile = oldFile;
@@ -159,7 +168,12 @@ public class ClassBoardService {
 			int classNum = Integer.parseInt(request.getParameter("classNum"));
 			// => BoardDAO 객체생성 deleteBoard(classNum) 호출
 			boardDAO = new ClassBoardDAO();
+			// 삭제할 클래스 대표 이미지 파일도 삭제
+			ClassBoardDTO boardDTO = boardDAO.getBoard(classNum);
 			boardDAO.deleteBoard(classNum);
+			if(boardDTO != null) {
+				FileUpload.delete(request, boardDTO.getClassFile());
+			}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

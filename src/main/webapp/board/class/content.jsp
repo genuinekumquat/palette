@@ -1,3 +1,4 @@
+<%@page import="com.itwillbs.domain.MemberDTO"%>
 <%@page import="com.itwillbs.domain.ReviewBoardDTO"%>
 <%@page import="com.itwillbs.domain.PageDTO"%>
 <%@page import="com.itwillbs.domain.ClassBoardDTO"%>
@@ -217,6 +218,16 @@ ClassBoardDTO boardDTO = (ClassBoardDTO)request.getAttribute("boardDTO");
 <input type="button" value="클래스 목록" class="btn" onclick = "location.href='classList.cbo'">
 <input type="button" value="예약하기" class="btn"
        					onclick="location.href='classWrite.cbo'">
+<%
+// 로그인한 회원정보 => 클래스를 등록한 호스트 본인만 수정, 삭제 버튼 보이기
+MemberDTO memberDTO = (MemberDTO)request.getAttribute("memberDTO");
+if (memberDTO != null && "host".equals(memberDTO.getMemberType())
+		&& memberDTO.getMemberId().equals(boardDTO.getHostId())) {%>
+<input type="button" value="클래스 수정" class="btn"
+       					onclick="location.href='classUpdate.cbo?classNum=<%=boardDTO.getClassNum() %>'">
+<input type="button" value="클래스 삭제" class="btn"
+       					onclick="if(confirm('클래스를 삭제하시겠습니까?')) location.href='classDelete.cbo?classNum=<%=boardDTO.getClassNum() %>'">
+<%}%>
 
 </div>
   </div>
