@@ -11,7 +11,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.itwillbs.domain.ClassBoardDTO;
 import com.itwillbs.domain.PageDTO;
+import com.itwillbs.domain.ReviewBoardDTO;
 import com.itwillbs.service.ClassBoardService;
+import com.itwillbs.service.ReviewBoardService;
 
 public class ClassBoardController extends HttpServlet { 
 	
@@ -109,6 +111,11 @@ public class ClassBoardController extends HttpServlet {
 			boardService = new ClassBoardService();
 			ClassBoardDTO boardDTO = boardService.getBoard(request);
 			request.setAttribute("boardDTO", boardDTO);
+			// 리뷰탭에 보여줄 해당 클래스 리뷰 리스트 (최신 작성순)
+			if(boardDTO != null) {
+				List<ReviewBoardDTO> reviewList = new ReviewBoardService().getBoardList(boardDTO.getClassNum());
+				request.setAttribute("reviewList", reviewList);
+			}
 			dispatcher = request.getRequestDispatcher("board/class/content.jsp");
 			dispatcher.forward(request, response);
 		}// classContent

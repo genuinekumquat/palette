@@ -75,7 +75,9 @@ CREATE TABLE notice (
 
 -- ---------------------------------------------------------------------
 --  review : lesson reviews written by guests
---  DAO: com.itwillbs.dao.ReviewBoardDAO  (read path only, incomplete)
+--  DAO: com.itwillbs.dao.ReviewBoardDAO
+--  Only a guest with a paid reservation (reserve + payment) for the
+--  class may write a review.
 -- ---------------------------------------------------------------------
 CREATE TABLE review (
     reviewNum        INT          NOT NULL AUTO_INCREMENT,
@@ -155,6 +157,21 @@ INSERT INTO notice (noticeNum, noticeSubject, noticeContent, noticeReadcount)
 VALUES
     (1, '서비스 오픈 안내', '클래스 예약 플랫폼이 오픈했습니다.', 0),
     (2, '환불 규정 안내',   '클래스 시작 3일 전까지 전액 환불됩니다.', 0);
+
+-- reserveGuestNum = member.memberNum (guest01 = 1, guest02 = 2)
+--   guest01 : class 1 paid            -> can review class 1
+--   guest02 : class 2 paid            -> can review class 2
+--   guest02 : class 1 reserved, unpaid -> cannot review class 1
+INSERT INTO reserve (classNum, reserveGuestNum, theNumOfReserveGuest)
+VALUES
+    (1, 1, 2),
+    (2, 2, 1),
+    (1, 2, 1);
+
+INSERT INTO payment (reserveNum, paymentPrice, paymentMethod)
+VALUES
+    (1, 90000, 1),
+    (2, 60000, 1);
 
 INSERT INTO review (classNum, reviewId, reviewContent)
 VALUES

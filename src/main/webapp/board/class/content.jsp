@@ -1,3 +1,4 @@
+<%@page import="com.itwillbs.domain.ReviewBoardDTO"%>
 <%@page import="com.itwillbs.domain.PageDTO"%>
 <%@page import="com.itwillbs.domain.ClassBoardDTO"%>
 <%@page import="java.util.List"%>
@@ -121,6 +122,27 @@ ul.tabs li.current{
 .tab-content.current{
   display: inherit;
 }
+
+.review{
+  padding: 15px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.review-info{
+  font-size: 13px;
+  color: #545454;
+  margin-bottom: 10px;
+}
+
+.review-img{
+  display: block;
+  max-width: 300px;
+  margin-bottom: 10px;
+}
+
+.review-empty{
+  color: #999;
+}
   </style>
   <meta charset="utf-8">
   <link rel="stylesheet" href="shopcss.css">
@@ -144,10 +166,20 @@ ul.tabs li.current{
     <div class="products">
         <h3>클래스 제목</h3> 
         
+ <%!
+// 사용자가 입력한 리뷰 내용 => HTML 태그로 실행되지 않게 변환
+String escape(String str) {
+	if(str == null) {
+		return "";
+	}
+	return str.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+			.replace("\"", "&quot;").replace("'", "&#39;");
+}
+%>
  <%
 
 ClassBoardDTO boardDTO = (ClassBoardDTO)request.getAttribute("boardDTO");
-%>       
+%>
 
  <div class="container">
  
@@ -173,8 +205,8 @@ ClassBoardDTO boardDTO = (ClassBoardDTO)request.getAttribute("boardDTO");
 </table>
         
 <input type="button" value="클래스 목록" class="btn" onclick = "location.href='classList.cbo'">
-<input type="button" value="예약하기" class="btn" 
-       					onclick="location.href='classWrite.cbo'">       					
+<input type="button" value="예약하기" class="btn"
+       					onclick="location.href='classWrite.cbo'">
 
 </div>
   </div>
@@ -184,7 +216,32 @@ ClassBoardDTO boardDTO = (ClassBoardDTO)request.getAttribute("boardDTO");
   </div>
   
   <div id="tab-3" class="tab-content">
-  클래스 리뷰 
+<input type="button" value="리뷰 작성" class="btn"
+       					onclick="location.href='reviewWrite.rbo?classNum=<%=boardDTO.getClassNum() %>'">
+<%
+// 해당 클래스 리뷰 리스트 (최신 작성순)
+List<ReviewBoardDTO> reviewList = (List<ReviewBoardDTO>)request.getAttribute("reviewList");
+if(reviewList == null || reviewList.isEmpty()) {
+%>
+<p class="review-empty">아직 작성된 리뷰가 없습니다.</p>
+<%
+} else {
+	for(ReviewBoardDTO reviewDTO : reviewList) {
+%>
+<div class="review">
+	<div class="review-info">
+		작성자 : <%=escape(reviewDTO.getReviewId()) %><br>
+		작성일 : <%=reviewDTO.getReviewIssueDate() %>
+	</div>
+<%	if(reviewDTO.getReviewFile() != null) { %>
+	<img src="upload/<%=escape(reviewDTO.getReviewFile()) %>" class="review-img">
+<%	} %>
+	<p class="review-content"><%=escape(reviewDTO.getReviewContent()).replace("\n", "<br>") %></p>
+</div>
+<%
+	}
+}
+%>
    </div>
  
 </div>
@@ -220,7 +277,12 @@ $(document).ready(function(){
     $(this).addClass('current');
     $("#"+tab_id).addClass('current');
   })
- 
+
+  // 리뷰 작성 후 이동하면 (tab=review) 리뷰탭 열어주기
+  <% if("review".equals(request.getParameter("tab"))) { %>
+  $('ul.tabs li[data-tab="tab-3"]').click();
+  <% } %>
+
 })
 
 </script>
