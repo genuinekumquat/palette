@@ -67,7 +67,7 @@ url-pattern: *.me *.cbo *.nbo *.rbo *.qbo *.re *.pa *.se  (web.xml)
   수정 폼이 `classNum`을 보내지 않아 `where classNum=0`으로 실행되던 문제를 수정했습니다.
 - **삭제 후 이동 주소 오류, 없는 클래스 접근 시 500 오류** (`52d6d6e`)
 
-복원·개선 이력은 `restore/portfolio-features` 브랜치의 커밋에서 기능별로 확인할 수 있습니다.
+복원·개선 이력은 `master`의 커밋 기록(`611dc86` ~ `29d8a29`)에서 기능별로 확인할 수 있습니다.
 
 ## 로컬 실행 방법 (IntelliJ IDEA Ultimate)
 
