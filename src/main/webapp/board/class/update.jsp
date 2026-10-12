@@ -1,3 +1,4 @@
+<%@page import="com.itwillbs.util.Html"%>
 <%@page import="com.itwillbs.domain.ClassBoardDTO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
@@ -5,83 +6,68 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Class 수정</title>
+<title>클래스 수정 | palette</title>
+<jsp:include page="/inc/head.jsp" />
 </head>
 <body>
+<jsp:include page="/inc/top.jsp" />
 <%!
-// 입력값 => HTML 태그로 실행되지 않게 변환
-String escape(String str) {
-	if(str == null) {
-		return "";
-	}
-	return str.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-			.replace("\"", "&quot;").replace("'", "&#39;");
-}
-
 // 기존에 선택된 값이면 selected
 String selected(String value, String option) {
 	return option.equals(value) ? "selected=\"selected\"" : "";
 }
 %>
 <%
-String memberId = (String)session.getAttribute("memberId");
 // 수정할 클래스 기존 정보
 ClassBoardDTO boardDTO = (ClassBoardDTO)request.getAttribute("boardDTO");
-String category = boardDTO.getClassCategory();
-String location = boardDTO.getClassLocation();
 %>
-	<h1>Class 수정</h1>
+<main class="content wrap">
+	<div class="form-box wide">
+		<h2 class="page-title">CLASS 수정</h2>
 
-	<!-- 파일 업로드 => enctype="multipart/form-data" -->
-	<form action="classUpdatePro.cbo" method="post" enctype="multipart/form-data">
-		<input type="hidden" name="classNum" value="<%=boardDTO.getClassNum() %>">
-		<table id="notice">
-			<tr>
-				<td>Class 제목</td>
-				<td><input type="text" name="classSubject" value="<%=escape(boardDTO.getClassSubject()) %>"></td>
-			</tr>
-			<tr>
-				<td>Class 가격</td>
-				<td><input type="text" name="classPrice" value="<%=boardDTO.getClassPrice() %>"></td>
-			</tr>
-			<tr>
-				<td>Class 카테고리</td>
-				<td>
-				<select style="width: 200px;" name="classCategory" class="form-control" required="required">
-				<option value="야외/체험" <%=selected(category, "야외/체험") %>>야외/체험</option>
-				<option value="만들기" <%=selected(category, "만들기") %>>만들기</option>
-				<option value="강의" <%=selected(category, "강의") %>>강의</option>
-				</select></td>
-			</tr>
-			<tr>
-				<td>Class 지역</td>
-				<td>
-				<select style="width: 200px;" name="classLocation" class="form-control" required="required">
-				<option value="서울" <%=selected(location, "서울") %>>서울</option>
-				<option value="경기" <%=selected(location, "경기") %>>경기</option>
-				<option value="부산" <%=selected(location, "부산") %>>부산</option>
-				<option value="제주" <%=selected(location, "제주") %>>제주</option>
-				</select></td>
-			</tr>
-			<tr>
-				<td>Class 소개</td>
-				<td><textarea rows="10" cols="20" name="classContent"><%=escape(boardDTO.getClassContent()) %></textarea></td>
-			</tr>
-			<tr>
-				<td>대표 이미지</td>
-				<td>
+		<!-- 파일 업로드 => enctype="multipart/form-data" -->
+		<form action="classUpdatePro.cbo" method="post" enctype="multipart/form-data">
+			<input type="hidden" name="classNum" value="<%=boardDTO.getClassNum() %>">
+			<div class="form-row">
+				<label>제목</label>
+				<input type="text" name="classSubject" class="form-control" value="<%=Html.escape(boardDTO.getClassSubject()) %>" required="required">
+			</div>
+			<div class="form-row">
+				<label>가격</label>
+				<input type="number" name="classPrice" class="form-control" min="0" value="<%=boardDTO.getClassPrice() %>" required="required">
+			</div>
+			<div class="form-row">
+				<label>카테고리</label>
+				<select name="classCategory" class="form-control" required="required">
+<%	for(String c : ClassBoardDTO.CATEGORIES) { %>
+					<option value="<%=c %>" <%=selected(boardDTO.getClassCategory(), c) %>><%=c %></option>
+<%	} %>
+				</select>
+			</div>
+			<div class="form-row">
+				<label>지역</label>
+				<select name="classLocation" class="form-control" required="required">
+<%	for(String l : ClassBoardDTO.LOCATIONS) { %>
+					<option value="<%=l %>" <%=selected(boardDTO.getClassLocation(), l) %>><%=l %></option>
+<%	} %>
+				</select>
+			</div>
+			<div class="form-row">
+				<label>소개</label>
+				<textarea name="classContent" class="form-control"><%=Html.escape(boardDTO.getClassContent()) %></textarea>
+			</div>
+			<div class="form-row">
+				<label>대표 이미지</label>
 <%	if(boardDTO.getClassFile() != null) { %>
-				<img src="upload/<%=escape(boardDTO.getClassFile()) %>" width="150"><br>
+				<img src="<%=Html.classImage(boardDTO.getClassFile()) %>" width="160" style="display:block; margin-bottom:10px; border-radius:8px;" alt="">
 <%	} %>
 				<!-- 새 이미지 선택 안하면 기존 이미지 유지 -->
 				<input type="file" name="classFile" accept="image/*">
-				</td>
-			</tr>
-		</table>
-		<div id="table_search">
-			<input type="submit" value="수정하기" class="btn">
-		</div>
-	</form>
-
+			</div>
+			<input type="submit" value="수정하기" class="btn btn-primary btn-block">
+		</form>
+	</div>
+</main>
+<jsp:include page="/inc/bottom.jsp" />
 </body>
 </html>

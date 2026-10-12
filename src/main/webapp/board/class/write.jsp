@@ -1,60 +1,57 @@
+<%@page import="com.itwillbs.domain.ClassBoardDTO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Class 등록</title>
+<title>클래스 등록 | palette</title>
+<jsp:include page="/inc/head.jsp" />
 </head>
 <body>
-<%
-String memberId = (String)session.getAttribute("memberId");
-%>
-	<h1>Class 등록</h1>
-	
-	<!-- 파일 업로드 => enctype="multipart/form-data" -->
-	<form action="classWritePro.cbo" method="post" enctype="multipart/form-data">
-		<table id="notice">
-			<tr>
-				<td>Class 제목</td>
-				<td><input type="text" name="classSubject"></td>
-			</tr>
-			<tr>
-				<td>Class 가격</td>
-				<td><input type="text" name="classPrice"></td>
-			</tr>
-			<tr>
-				<td>Class 카테고리</td>
-				<td>
-				<select style="width: 200px;" name="classCategory" class="form-control" required="required">
-				<option value="야외/체험" selected="selected">야외/체험</option>
-				<option value="만들기">만들기</option>
-				<option value="강의">강의</option>
-				</select></td>
-			</tr>
-			<tr>
-				<td>Class 지역</td>
-				<td>
-				<select style="width: 200px;" name="classLocation" class="form-control" required="required">
-				<option value="서울" selected="selected">서울</option>
-				<option value="경기">경기</option>
-				<option value="부산">부산</option>
-				<option value="제주">제주</option>
-				</select></td>
-			</tr>
-			<tr>
-				<td>Class 소개</td>
-				<td><textarea rows="10" cols="20" name="classContent"></textarea></td>
-			</tr>
-			<tr>
-				<td>대표 이미지</td>
-				<td><input type="file" name="classFile" accept="image/*"></td>
-			</tr>
-		</table>
-		<div id="table_search">
-			<input type="submit" value="글쓰기" class="btn">
-		</div>
-	</form>
+<jsp:include page="/inc/top.jsp" />
+<main class="content wrap">
+	<div class="form-box wide">
+		<h2 class="page-title">CLASS 등록</h2>
 
+		<!-- 파일 업로드 => enctype="multipart/form-data" -->
+		<form action="classWritePro.cbo" method="post" enctype="multipart/form-data">
+			<div class="form-row">
+				<label>제목</label>
+				<input type="text" name="classSubject" class="form-control" required="required">
+			</div>
+			<div class="form-row">
+				<label>가격</label>
+				<input type="number" name="classPrice" class="form-control" min="0" required="required">
+			</div>
+			<div class="form-row">
+				<label>카테고리</label>
+				<select name="classCategory" class="form-control" required="required">
+<%	for(String c : ClassBoardDTO.CATEGORIES) { %>
+					<option value="<%=c %>"><%=c %></option>
+<%	} %>
+				</select>
+			</div>
+			<div class="form-row">
+				<label>지역</label>
+				<select name="classLocation" class="form-control" required="required">
+<%	for(String l : ClassBoardDTO.LOCATIONS) { %>
+					<option value="<%=l %>"><%=l %></option>
+<%	} %>
+				</select>
+			</div>
+			<div class="form-row">
+				<label>소개</label>
+				<textarea name="classContent" class="form-control"></textarea>
+			</div>
+			<div class="form-row">
+				<label>대표 이미지</label>
+				<input type="file" name="classFile" accept="image/*">
+			</div>
+			<input type="submit" value="글쓰기" class="btn btn-primary btn-block">
+		</form>
+	</div>
+</main>
+<jsp:include page="/inc/bottom.jsp" />
 </body>
 </html>

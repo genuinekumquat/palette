@@ -149,9 +149,9 @@ VALUES
 
 INSERT INTO `class` (classSubject, hostId, classPrice, classCategory, classLocation, classContent)
 VALUES
-    ('초보를 위한 홈베이킹 원데이 클래스', 'host01', 45000, '베이킹', '서울 마포구', '스콘과 파운드케이크를 직접 만들어 갑니다.'),
-    ('주말 프렌치 요리 클래스',            'host01', 60000, '쿠킹',   '서울 마포구', '가정에서 즐기는 프렌치 3코스.'),
-    ('원데이 수채화 드로잉',               'host01', 35000, '드로잉', '서울 마포구', '재료 일체 포함, 엽서 2장 완성.');
+    ('초보를 위한 홈베이킹 원데이 클래스', 'host01', 45000, '요리',   '서울', '스콘과 파운드케이크를 직접 만들어 갑니다.'),
+    ('주말 프렌치 요리 클래스',            'host01', 60000, '요리',   '서울', '가정에서 즐기는 프렌치 3코스.'),
+    ('원데이 수채화 드로잉',               'host01', 35000, '드로잉', '서울', '재료 일체 포함, 엽서 2장 완성.');
 
 INSERT INTO notice (noticeNum, noticeSubject, noticeContent, noticeReadcount)
 VALUES

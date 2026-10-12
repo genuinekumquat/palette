@@ -4,69 +4,31 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>아이디 찾기 | palette</title>
+<jsp:include page="/inc/head.jsp" />
 </head>
 <body>
-<h1>아이디찾기</h1>
+<jsp:include page="/inc/top.jsp" />
+<main class="content wrap">
+	<div class="form-box">
+		<h2 class="page-title">아이디 찾기</h2>
+		<p class="desc">가입시 입력한 이름과 이메일로 아이디를 찾을 수 있습니다.</p>
 
-<!-- form -->
-<form action="findIdPro.me" method="post"  id="checkForm">
-이름 : <input type="text" name="memberName"><br>
-이메일 : <input type="text" name="memberEmail">
-<div id="div1"></div>
- 
- <input type="submit" value="찾기" id="find">
-</form>
+		<form action="findIdPro.me" method="post">
+			<div class="form-row">
+				<input type="text" name="memberName" class="form-control" placeholder="이름" required="required">
+			</div>
+			<div class="form-row">
+				<input type="email" name="memberEmail" class="form-control" placeholder="이메일" required="required">
+			</div>
+			<input type="submit" value="아이디 찾기" class="btn btn-primary btn-block">
+		</form>
 
-<!-- script -->
-<script type="text/javascript" src="../../script/jquery-3.7.0.js"></script>
-<script type="text/javascript">
-
-// 이름 name
-// 이메일 email
-
-// $(document).ready(function(){
-// 	$('#checkForm').submit(function(){
-// 		// 이름
-// 		// 값이 없다면
-//  		if($('#name').val() ==""){
-// 			// 이름 밑 div 공간에 빨간글씨로 출력
-// 			$('#div1').html("아이디를 입력해주세요").css("color","red");
-// 			// 이름 포커스
-// 			$('#name').focus();
-// 			return false;
-// 		} else {
-// 			// div1 공간 내용 지우기
-// 			$('#div1').empty();
-// 			// 모든조건 충족했으므로 다음 포커스
-// 			$('#email').focus();
-// 		} 
-//  		if($('#email').val() ==""){
-// 			$('#div1').html("이메일을 입력해주세요").css("color","red"); 
-// 			$('#email').focus();
-// 			return false;
-// 		}else if($('#emailop').val() ==""){
-// 			$('#div1').html("이메일을 선택해주세요").css("color","red"); 
-// 			$('#emailop').focus();
-// 			return false;
-// 		}else if ($()){
-			
-// 			//	$('#div1').html("회원정보가 일치하지 않습니다").css("color","red"); 
-// 			//}
-// 			//https://chicken-tender-2019.tistory.com/126 참고하여 내일 수정하겠습니다.
-// 		} else {
-			
-// 			// return;
-// 			}
-// 		}
-// 	});
-// }); 
-
-
-</script>
-
-</body>
-</html>
-
+		<div class="form-links">
+			<a href="login.me">로그인</a>|<a href="findPassword.me">비밀번호 찾기</a>
+		</div>
+	</div>
+</main>
+<jsp:include page="/inc/bottom.jsp" />
 </body>
 </html>

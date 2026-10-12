@@ -2,6 +2,7 @@ package com.itwillbs.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -10,7 +11,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.itwillbs.domain.ClassBoardDTO;
 import com.itwillbs.domain.MemberDTO;
+import com.itwillbs.domain.PageDTO;
+import com.itwillbs.service.ClassBoardService;
 import com.itwillbs.service.MemberService;
 import com.itwillbs.service.NoticeBoardService;
 
@@ -40,6 +44,12 @@ public class MemberController extends HttpServlet {
 		System.out.println("뽑아온 가상주소 : " + sPath);
 
 		if (sPath.equals("/main.me")) {
+			// 메인 NEW CLASS => 최근 등록된 클래스 3개
+			PageDTO pageDTO = new PageDTO();
+			pageDTO.setPageSize(3);
+			pageDTO.setCurrentPage(1);
+			List<ClassBoardDTO> newList = new ClassBoardService().getBoardList(pageDTO);
+			request.setAttribute("newList", newList);
 			dispatcher = request.getRequestDispatcher("main/main.jsp");
 			dispatcher.forward(request, response);
 		} // main.me
@@ -316,6 +326,25 @@ public class MemberController extends HttpServlet {
 				dispatcher.forward(request, response);
 			}
 		} // PasswordResetPro
+
+		if (sPath.equals("/mypage.me")) { // 마이페이지
+			HttpSession session = request.getSession();
+			String memberId = (String) session.getAttribute("memberId");
+			if (memberId == null) {
+				// 로그인 안했으면 => 로그인페이지로 이동
+				request.setAttribute("msg", "로그인 후 이용할 수 있습니다.");
+				request.setAttribute("url", "login.me");
+				dispatcher = request.getRequestDispatcher("board/msg.jsp");
+				dispatcher.forward(request, response);
+				return;
+			}
+			// 로그인한 회원정보 => 호스트, 게스트에 따라 다른 메뉴 보여줌
+			memberService = new MemberService();
+			MemberDTO memberDTO = memberService.getMember(memberId);
+			request.setAttribute("memberDTO", memberDTO);
+			dispatcher = request.getRequestDispatcher("member/memberInfo/info.jsp");
+			dispatcher.forward(request, response);
+		} // mypage
 
 	}
 }

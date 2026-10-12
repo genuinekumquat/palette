@@ -4,6 +4,11 @@ import java.sql.Timestamp;
 
 public class ClassBoardDTO {
 
+	// 클래스 카테고리 (등록/수정 선택, 메인 카테고리)
+	public static final String[] CATEGORIES = {"요리", "수공예", "드로잉", "액티비티"};
+	// 클래스 개최 지역 (등록/수정 선택)
+	public static final String[] LOCATIONS = {"서울", "경기", "부산", "제주"};
+
 	private int classNum; // 클래스 번호
 	private String classSubject; // 클래스 제목
 	private String hostId; // 클래스 호스트 번호 -> 호스트 테이블 참조
